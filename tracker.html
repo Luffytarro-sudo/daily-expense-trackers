@@ -87,6 +87,7 @@
   <!-- Profile Picture Section -->
   <div class="profile-pic-container">
     <img src="https://via.placeholder.com/120" id="profilePic" alt="Profile Picture" class="profile-pic"/>
+    <input type="file" id="profilePicUpload" accept="image/*" onchange="uploadProfilePic()" />
     <p><strong>Your Profile Picture</strong></p>
   </div>
 
@@ -132,13 +133,125 @@
 </div>
 
 <script>
-  // Load profile picture
+  let dailyBudget = 0;
+  let remainingBudget = 0;
+  let totalSaved = 0;
+  let expenses = [];
+
+  // Load profile picture and saved data from localStorage
   window.onload = function () {
     const savedProfilePic = localStorage.getItem("profilePic");
     if (savedProfilePic) {
       document.getElementById("profilePic").src = savedProfilePic;
     }
+
+    const savedBudget = JSON.parse(localStorage.getItem("budgetData"));
+    const savedExpenses = JSON.parse(localStorage.getItem("expenses"));
+
+    if (savedBudget) {
+      dailyBudget = savedBudget.dailyBudget;
+      remainingBudget = savedBudget.remainingBudget;
+      totalSaved = savedBudget.totalSaved;
+
+      document.getElementById("dailyBudget").innerText = dailyBudget;
+      document.getElementById("remainingBudget").innerText = remainingBudget.toFixed(2);
+      document.getElementById("totalSaved").innerText = totalSaved.toFixed(2);
+    }
+
+    if (savedExpenses && Array.isArray(savedExpenses)) {
+      expenses = savedExpenses;
+      expenses.forEach(addExpenseToTable);
+    }
   };
+
+  function calculateBudget() {
+    const allowance = parseFloat(document.getElementById("monthlyAllowance").value);
+    const fixed = parseFloat(document.getElementById("fixedExpense").value);
+    const days = parseInt(document.getElementById("daysInMonth").value);
+
+    const netAllowance = allowance - fixed;
+    dailyBudget = (netAllowance / days).toFixed(2);
+    remainingBudget = netAllowance;
+    totalSaved = 0;
+    expenses = [];
+
+    document.getElementById("dailyBudget").innerText = dailyBudget;
+    document.getElementById("remainingBudget").innerText = remainingBudget.toFixed(2);
+    document.getElementById("totalSaved").innerText = totalSaved.toFixed(2);
+
+    document.getElementById("expenseTable").innerHTML = "";
+
+    // Save budget data to localStorage
+    saveData();
+  }
+
+  function addExpense() {
+    const date = document.getElementById("expenseDate").value;
+    const item = document.getElementById("itemName").value;
+    const amount = parseFloat(document.getElementById("amountSpent").value);
+
+    if (!date || !item || isNaN(amount)) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    const saved = (dailyBudget - amount).toFixed(2);
+    const savedAmount = saved > 0 ? parseFloat(saved) : 0;
+
+    totalSaved += savedAmount;
+    remainingBudget -= amount;
+
+    const newExpense = { date, item, amount, saved: savedAmount };
+    expenses.push(newExpense);
+    addExpenseToTable(newExpense);
+
+    document.getElementById("remainingBudget").innerText = remainingBudget.toFixed(2);
+    document.getElementById("totalSaved").innerText = totalSaved.toFixed(2);
+
+    // Save data to localStorage
+    saveData();
+
+    document.getElementById("expenseDate").value = "";
+    document.getElementById("itemName").value = "";
+    document.getElementById("amountSpent").value = "";
+  }
+
+  function addExpenseToTable(exp) {
+    const table = document.getElementById("expenseTable");
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${exp.date}</td>
+      <td>${exp.item}</td>
+      <td>₱${exp.amount.toFixed(2)}</td>
+      <td>₱${dailyBudget}</td>
+      <td>₱${exp.saved.toFixed(2)}</td>
+    `;
+    table.appendChild(row);
+  }
+
+  function saveData() {
+    localStorage.setItem("budgetData", JSON.stringify({
+      dailyBudget,
+      remainingBudget,
+      totalSaved
+    }));
+    localStorage.setItem("expenses", JSON.stringify(expenses));
+  }
+
+  // Function to handle profile picture upload
+  function uploadProfilePic() {
+    const fileInput = document.getElementById("profilePicUpload");
+    const file = fileInput.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = function () {
+        const imgSrc = reader.result;
+        document.getElementById("profilePic").src = imgSrc;
+        localStorage.setItem("profilePic", imgSrc); // Save to localStorage
+      };
+      reader.readAsDataURL(file);
+    }
+  }
 </script>
 
 </body>
