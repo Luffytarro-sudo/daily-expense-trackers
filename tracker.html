@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Daily Expense Tracker</title>
+  <style>
+    /* Styling for the overall page */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #007bff;
+      margin-bottom: 20px;
+    }
+    .profile-pic-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .profile-pic {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #007bff;
+      margin-bottom: 10px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 1em;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .summary p {
+      font-weight: bold;
+      margin: 8px 0;
+    }
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+    }
+    th {
+      background-color: #007bff;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Daily Expense Tracker</h1>
+
+  <!-- Profile Picture Section -->
+  <div class="profile-pic-container">
+    <img src="https://via.placeholder.com/120" id="profilePic" alt="Profile Picture" class="profile-pic"/>
+    <p><strong>Your Profile Picture</strong></p>
+  </div>
+
+  <!-- Expense Setup Section -->
+  <label>Monthly Allowance:</label>
+  <input type="number" id="monthlyAllowance" value="5000">
+  <label>Boarding House Rent:</label>
+  <input type="number" id="fixedExpense" value="850">
+  <label>Days in Month:</label>
+  <input type="number" id="daysInMonth" value="31">
+  <button onclick="calculateBudget()">Set Budget</button>
+
+  <div class="summary">
+    <p>Daily Budget: ₱<span id="dailyBudget">0</span></p>
+    <p>Remaining Budget: ₱<span id="remainingBudget">0</span></p>
+    <p>Total Saved: ₱<span id="totalSaved">0</span></p>
+  </div>
+
+  <hr>
+
+  <!-- Add Expense Section -->
+  <label>Date:</label>
+  <input type="date" id="expenseDate">
+  <label>Item Name:</label>
+  <input type="text" id="itemName">
+  <label>Amount Spent:</label>
+  <input type="number" id="amountSpent">
+  <button onclick="addExpense()">Add Expense</button>
+
+  <!-- Expense Table -->
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Item</th>
+        <th>Amount</th>
+        <th>Daily Budget</th>
+        <th>Saved</th>
+      </tr>
+    </thead>
+    <tbody id="expenseTable"></tbody>
+  </table>
+</div>
+
+<script>
+  // Load profile picture
+  window.onload = function () {
+    const savedProfilePic = localStorage.getItem("profilePic");
+    if (savedProfilePic) {
+      document.getElementById("profilePic").src = savedProfilePic;
+    }
+  };
+</script>
+
+</body>
+</html>
